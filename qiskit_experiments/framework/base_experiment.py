@@ -298,6 +298,7 @@ class BaseExperiment(ABC, StoreInitArgs):
     def run(
         self,
         backend: Optional[Backend] = None,
+        service: Optional[IBMExperimentService] = None,
         analysis: Optional[Union[BaseAnalysis, None]] = "default",
         timeout: Optional[float] = None,
         **run_options,
@@ -308,6 +309,7 @@ class BaseExperiment(ABC, StoreInitArgs):
             backend: Optional, the backend to run the experiment on. This
                      will override any currently set backends for the single
                      execution.
+            service: Optional, the service to store the experiment results to the database
             analysis: Optional, a custom analysis instance to use for performing
                       analysis. If None analysis will not be run. If ``"default"``
                       the experiments :meth:`analysis` instance will be used if
@@ -323,6 +325,9 @@ class BaseExperiment(ABC, StoreInitArgs):
             QiskitError: If experiment is run with an incompatible existing
                          ExperimentData container.
         """
+
+        if service is not None and not isinstance(service, IBMExperimentService):
+            raise QiskitError("Invalid service.")
 
         if backend is not None or analysis != "default" or run_options:
             # Make a copy to update analysis or backend if one is provided at runtime
@@ -346,7 +351,7 @@ class BaseExperiment(ABC, StoreInitArgs):
         transpiled_circuits = experiment._transpiled_circuits()
 
         # Initialize result container
-        experiment_data = experiment._initialize_experiment_data()
+        experiment_data = experiment._initialize_experiment_data(service=service)
 
         # Run options
         run_opts = experiment.run_options.__dict__
