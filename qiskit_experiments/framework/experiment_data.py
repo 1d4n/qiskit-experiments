@@ -779,7 +779,7 @@ class ExperimentData:
             if self.backend is not None:
                 backend_name = BackendData(self.backend).name
                 job_backend_name = BackendData(job.backend()).name
-                if self.backend and backend_name != job_backend_name:
+                if backend_name != job_backend_name and job_backend_name != 'aer_simulator':
                     LOG.warning(
                         "Adding a job from a backend (%s) that is different "
                         "than the current backend (%s). "
@@ -788,7 +788,9 @@ class ExperimentData:
                         job.backend(),
                         self.backend,
                     )
-            self.backend = job.backend()
+                    self.backend = job.backend()
+            else:
+                self.backend = job.backend()
 
             jid = job.job_id()
             if jid in self._jobs:

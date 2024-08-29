@@ -281,7 +281,7 @@ class BaseExperiment(ABC, StoreInitArgs):
                 backend_name = data.backend
                 if backend_name:
                     try:
-                        reconstructed_experiment.backend = provider.get_backend(backend_name)
+                        reconstructed_experiment.backend = provider.backend(backend_name)
                     except Exception:  # pylint: disable=broad-except
                         warnings.warn("Unable to retrieve backend.")
                 else:
